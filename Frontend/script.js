@@ -6,13 +6,11 @@ const category = document.querySelector('#form-category');
 const des = document.querySelector('#form-des');
 const list = document.querySelector('#list');
 
-const api = 'http://localhost:4000/expence'
+const api = 'http://localhost:4000/expense'
 
-// Fetch users from local storage
 
-// if(!localStorage.getItem('expense')) localStorage.setItem('expense', JSON.stringify({ count: 0,}));
-// let expenseObj = JSON.parse(localStorage.getItem('expense'));
-// for(exp in expenseObj) if(exp != 'count')addExpense(exp);
+
+//on refresh
 
 window.addEventListener('DOMContentLoaded', onRefresh);
 async function onRefresh() {
@@ -22,39 +20,29 @@ async function onRefresh() {
 
 
 
+
 // Managing form Events
+
 let editId = null;
 form.addEventListener('submit', onSubmit);
 async function onSubmit(e) {
     e.preventDefault();
-    //console.log(amount.value, category.value, des.value);
-    //const id = storeLocally(amount.value, category.value, des.value);
-    const expence = {
+    const expense = {
         amount : amount.value,
         category : category.value,
-        des : des.value,
+        description : des.value,
     }
+    console.log(editId)
     if(editId) {
-        url = api + `/edit?id=${editId}`;
+        url = api + `/edit/${editId}`;
         editId = null;
     } else url = api + '/add';
-    const { data } = await axios.post(url, expence);
+    const { data } = await axios.post(url, expense);
     addExpense(data);
     amount.value = '';
     des.value = '';
 }
 
-
-
-
-// Store Expence
-
-// function storeLocally(amount, category, des) {
-//     expenseObj["count"]++;
-//     expenseObj[expenseObj.count] = {amount, category, des};
-//     updateStorage();
-//     return expenseObj.count;
-// }
 
 
 
@@ -73,11 +61,10 @@ function listEvent(e) {
 
 async function dlt(li) {
     const id = li.getAttribute('data-id');
-    await axios.post(url + `/delete?id=${id}`);
-    // delete expenseObj[id];
-    // updateStorage();
     li.style.display = 'none';
+    await axios.post(api + `/delete/${id}`, {});
 }
+
 
 
 
@@ -93,6 +80,8 @@ async function edit(li) {
 }
 
 
+
+
 // Utility functions
 
 function addExpense(obj) {
@@ -103,7 +92,7 @@ function addExpense(obj) {
     const amt =  addElement('span', li, obj.amount);
     const edit = addElement('button', li, 'Edit', 'btn', 'btn-sm', 'float-right', 'btn-warning', 'ml-2', 'edit');
     const dlt = addElement('button', li, 'X', 'btn-danger',  'btn-sm', 'float-right', 'delete');
-    const des = addElement('small', li, obj.des, 'd-block', 'text-muted', 'mt-1');
+    const des = addElement('small', li, obj.description, 'd-block', 'text-muted', 'mt-1');
 }
 
 function addElement(type, parent, text, ...classes) {
@@ -113,7 +102,3 @@ function addElement(type, parent, text, ...classes) {
     parent.append(element);
     return element;
 }
-
-// function updateStorage() {
-//     localStorage.setItem('expense', JSON.stringify(expenseObj));
-// }
